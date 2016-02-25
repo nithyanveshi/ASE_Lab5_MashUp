@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+    <link rel="stylesheet" type="text/css" href="style.css"/>
+</head>
+<body>
+<form id="speechForm" method="get" action="https://www.google.com/search">
+    <p id="msg" style="text-align: center"></p>
+    <div class="speech">
+        <img onclick="startDictation(event)" id="mic_img" src="./resources/mic.gif" />
+    </div>
+    <div id="results">
+        <span id="final_span" class="final"></span>
+        <span id="interim_span" class="interim"></span>
+        <p>
+    </div>
+    <div class="buttonClass">
+        <button id="translatebutton" class="button" onclick="translate()">
+            Translate to Hindi</button>
+    </div>
+</form>
+
+</body>
+<script src="app.js" type="text/javascript"></script>
+</html>
