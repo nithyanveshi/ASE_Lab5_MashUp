@@ -1,105 +1,65 @@
 /**
  * Created by rapar on 2/24/2016.
  */
-var final_transcript = '';
-var recognizing = false;
-var ignore_onend;
-var start_timestamp;
-var mic_img = document.getElementById("mic_img");
-var final_span = document.getElementById("final_span");
-var interim_span = document.getElementById("interim_span");
-var msg = document.getElementById("msg");
-msg.innerHTML = "Click on the microphone icon and begin speaking.";
-if (!('webkitSpeechRecognition' in window)) {
-    msg.innerHTML = "Web Speech API is not supported by this browser. Please upgrade";
-} else {
-    var mic = new webkitSpeechRecognition();
-    mic.continuous = true;
-    mic.interimResults = true;
+angular.module( 'sample', [
+        'auth0',
+        'ngRoute',
+        'sample.home',
+        'sample.login',
+        'angular-storage',
+        'angular-jwt'
+    ])
+    .config( function myAppConfig ( $routeProvider, authProvider, $httpProvider, $locationProvider,
+                                    jwtInterceptorProvider) {
+        $routeProvider
+            .when( '/', {
+                controller: 'HomeCtrl',
+                templateUrl: 'home/home.html',
+                pageTitle: 'Homepage',
+                requiresLogin: true
+            })
+            .when( '/login', {
+                controller: 'LoginCtrl',
+                templateUrl: 'login/login.html',
+                pageTitle: 'Login'
+            });
 
-    mic.onstart = function() {
-        recognizing = true;
-        msg.innerHTML = "Listening";
-        mic_img.src = './resources/mic-animate.gif';
-    };
 
-    mic.onerror = function(event) {
-        if (event.error == 'no-speech') {
-            mic_img.src = './resources/mic.gif';
-            msg.innerHTML = "No speech was detected.";
-            ignore_onend = true;
+        authProvider.init({
+            domain: AUTH0_DOMAIN,
+            clientID: AUTH0_CLIENT_ID,
+            loginUrl: '/login'
+        });
+
+        jwtInterceptorProvider.tokenGetter = function(store) {
+            return store.get('token');
         }
-        if (event.error == 'audio-capture') {
-            mic_img.src = './resources/mic.gif';
-            showInfo('info_no_microphone');
-            ignore_onend = true;
-        }
-        if (event.error == 'not-allowed') {
-            if (event.timeStamp - start_timestamp < 100) {
-                msg.innerHTML = "Permission to use microphone was blocked.";
-            } else {
-                msg.innerHTML = "Permission to use microphone was denied.";
+
+        // Add a simple interceptor that will fetch all requests and add the jwt token to its authorization header.
+        // NOTE: in case you are calling APIs which expect a token signed with a different secret, you might
+        // want to check the delegation-token example
+        $httpProvider.interceptors.push('jwtInterceptor');
+    }).run(function($rootScope, auth, store, jwtHelper, $location) {
+        $rootScope.$on('$locationChangeStart', function() {
+            if (!auth.isAuthenticated) {
+                var token = store.get('token');
+                if (token) {
+                    if (!jwtHelper.isTokenExpired(token)) {
+                        auth.authenticate(store.get('profile'), token);
+                    } else {
+                        $location.path('/login');
+                    }
+                }
             }
-            ignore_onend = true;
-        }
-    };
 
-    mic.onend = function() {
-        recognizing = false;
-        if (ignore_onend) {
-            return;
-        }
-        mic_img.src = './resources/mic.gif';
-        if (!final_transcript) {
-            msg.innerHTML = "Click on the microphone icon and begin speaking.";
-            return;
-        }
-        msg.innerHTML = "Proceed to translate.";
-        if (window.getSelection) {
-            window.getSelection().removeAllRanges();
-            var range = document.createRange();
-            range.selectNode(document.getElementById('final_span'));
-            window.getSelection().addRange(range);
-        }
-//        alert("In app.js "+final_span.innerHTML);
-    };
-
-    mic.onresult = function(event) {
-        var interim_transcript = '';
-        for (var i = event.resultIndex; i < event.results.length; ++i) {
-            if (event.results[i].isFinal) {
-                final_transcript += event.results[i][0].transcript;
-            } else {
-                interim_transcript += event.results[i][0].transcript;
+        });
+    })
+    .controller( 'AppCtrl', function AppCtrl ( $scope, $location ) {
+        $scope.$on('$routeChangeSuccess', function(e, nextRoute){
+            if ( nextRoute.$$route && angular.isDefined( nextRoute.$$route.pageTitle ) ) {
+                $scope.pageTitle = nextRoute.$$route.pageTitle + ' | Auth0 Sample' ;
             }
-        }
-        final_transcript = capitalize(final_transcript);
-        final_span.innerHTML = linebreak(final_transcript);
-        interim_span.innerHTML = linebreak(interim_transcript);
-    };
-}
-var two_line = /\n\n/g;
-var one_line = /\n/g;
-function linebreak(s) {
-    return s.replace(two_line, '<p></p>').replace(one_line, '<br>');
-}
+        });
+    });
 
-var first_char = /\S/;
-function capitalize(s) {
-    return s.replace(first_char, function(m) { return m.toUpperCase(); });
-}
-function startDictation(event){
-    if (recognizing) {
-        mic.stop();
-        return;
-    }
-    final_transcript = '';
-    mic.start();
-    ignore_onend = false;
-    final_span.innerHTML = '';
-    interim_span.innerHTML = '';
-    mic_img.src = './resources/mic-slash.gif';
-
-    start_timestamp = event.timeStamp;
-}
 

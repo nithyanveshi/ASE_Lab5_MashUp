@@ -41,3 +41,6 @@
     text-align: left;
     min-height: 150px;
 }
+.login-page .login-box {
+    padding: 100px 0;
+}

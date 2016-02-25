@@ -1,0 +1,27 @@
+<div class="home">
+    <img src="{{auth.profile.picture}}" style="height: 65px;width: 65px;"/>
+    <h2>Welcome {{auth.profile.nickname}}</h2>
+<form id="speechForm" >
+    <p id="msg" style="text-align: center">Click on the microphone icon and begin speaking.</p>
+    <div class="speech">
+        <img onclick="startDictation(event)" id="mic_img" src="http://i68.tinypic.com/5cimwp.jpg" />
+    </div>
+    <div class="results">
+        <span id="final_span" class="final"></span>
+        <span id="interim_span" class="interim"></span>
+        <p>
+    </div>
+</form>
+<div class="buttonClass">
+<input type='button' class="button" onclick='helloWorld()' value='🔊 Play' />
+<script src='https://code.responsivevoice.org/responsivevoice.js'></script>
+    <script type="text/javascript" src="translateThis.js"></script>
+</div>
+    <button class="btn-sm btn-warning" ng-click="logout()">Logout</button>
+</div>
+<script>
+    function helloWorld(){
+        var nameValue = document.getElementById("final_span").innerHTML;
+        responsiveVoice.speak(nameValue);
+    }
+</script>
