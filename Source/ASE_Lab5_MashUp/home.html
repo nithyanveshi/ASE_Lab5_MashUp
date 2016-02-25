@@ -4,24 +4,32 @@
     <meta charset="UTF-8">
     <title>Home</title>
     <link rel="stylesheet" type="text/css" href="style.css"/>
+    <script data-require="angular.js@1.2.x" src="https://code.angularjs.org/1.2.16/angular.js" data-semver="1.2.16"></script>
+    <script data-require="jquery@*" data-semver="2.0.3" src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
+
 </head>
 <body>
-<form id="speechForm" method="get" action="https://www.google.com/search">
+<form id="speechForm" >
     <p id="msg" style="text-align: center"></p>
     <div class="speech">
         <img onclick="startDictation(event)" id="mic_img" src="./resources/mic.gif" />
     </div>
-    <div id="results">
+    <div class="results">
         <span id="final_span" class="final"></span>
         <span id="interim_span" class="interim"></span>
         <p>
     </div>
-    <div class="buttonClass">
-        <button id="translatebutton" class="button" onclick="translate()">
-            Translate to Hindi</button>
-    </div>
 </form>
-
+<div class="buttonClass">
+<input type='button' class="button" onclick='helloWorld()' value='🔊 Play' />
+<script src='https://code.responsivevoice.org/responsivevoice.js'></script>
+</div>
 </body>
 <script src="app.js" type="text/javascript"></script>
+<script>
+    function helloWorld(){
+        var nameValue = document.getElementById("final_span").innerHTML;
+        responsiveVoice.speak(nameValue);
+    }
+</script>
 </html>

@@ -19,6 +19,7 @@ if (!('webkitSpeechRecognition' in window)) {
 
     mic.onstart = function() {
         recognizing = true;
+        msg.innerHTML = "Listening";
         mic_img.src = './resources/mic-animate.gif';
     };
 
@@ -60,6 +61,7 @@ if (!('webkitSpeechRecognition' in window)) {
             range.selectNode(document.getElementById('final_span'));
             window.getSelection().addRange(range);
         }
+//        alert("In app.js "+final_span.innerHTML);
     };
 
     mic.onresult = function(event) {
@@ -100,3 +102,4 @@ function startDictation(event){
 
     start_timestamp = event.timeStamp;
 }
+

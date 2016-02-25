@@ -33,7 +33,7 @@
     border: 0;
     padding: 0;
 }
-#results {
+.results {
     font-size: 14px;
     font-weight: bold;
     border: 1px solid #ddd;
